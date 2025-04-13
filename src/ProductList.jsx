@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import './ProductList.css'
+import { useDispatch, useSelector } from 'react-redux'; // Added useSelector
+import './ProductList.css';
 import CartItem from './CartItem';
 import { addItem } from './CartSlice';
 
 function ProductList({ onHomeClick }) {
     const [showCart, setShowCart] = useState(false);
-    const [showPlants, setShowPlants] = useState(false); // State to control the visibility of the About Us page
+    // Removed showPlants as it's not used
     const [addedToCart, setAddedToCart] = useState({});
     const dispatch = useDispatch();
-
+    const cart = useSelector(state => state.cart.items);
+    const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
 
     const plantsArray = [
         {
@@ -58,13 +59,13 @@ function ProductList({ onHomeClick }) {
             plants: [
                 {
                     name: "Lavender",
-                    image: "https://images.unsplash.com/photo-1611909023032-2d6b3134ecba?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                    image: "https://images.unsplash.com/photo-1611625105602-42ee06be977e?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
                     description: "Calming scent, used in aromatherapy.",
                     cost: "$20"
                 },
                 {
                     name: "Jasmine",
-                    image: "https://images.unsplash.com/photo-1592729645009-b96d1e63d14b?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                    image: "https://images.unsplash.com/photo-1624396593468-0230b5c9c29e?q=80&w=1973&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
                     description: "Sweet fragrance, promotes relaxation.",
                     cost: "$18"
                 },
@@ -123,7 +124,7 @@ function ProductList({ onHomeClick }) {
                 },
                 {
                     name: "Lavender",
-                    image: "https://images.unsplash.com/photo-1611909023032-2d6b3134ecba?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                    image: "https://images.unsplash.com/photo-1611625105602-42ee06be977e?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
                     description: "Calming scent, used in aromatherapy.",
                     cost: "$20"
                 },
@@ -218,26 +219,29 @@ function ProductList({ onHomeClick }) {
             ]
         }
     ];
+
     const styleObj = {
         backgroundColor: '#4CAF50',
         color: '#fff!important',
         padding: '15px',
         display: 'flex',
         justifyContent: 'space-between',
-        alignIems: 'center',
+        alignItems: 'center', // Fixed typo
         fontSize: '20px',
-    }
+    };
+
     const styleObjUl = {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         width: '1100px',
-    }
+    };
+
     const styleA = {
         color: 'white',
         fontSize: '30px',
         textDecoration: 'none',
-    }
+    };
 
     const handleHomeClick = (e) => {
         e.preventDefault();
@@ -246,12 +250,12 @@ function ProductList({ onHomeClick }) {
 
     const handleCartClick = (e) => {
         e.preventDefault();
-        setShowCart(true); // Set showCart to true when cart icon is clicked
+        setShowCart(true);
     };
+
     const handlePlantsClick = (e) => {
         e.preventDefault();
-        setShowPlants(true); // Set showAboutUs to true when "About Us" link is clicked
-        setShowCart(false); // Hide the cart when navigating to About Us
+        setShowCart(false); // Show plants list by hiding cart
     };
 
     const handleContinueShopping = (e) => {
@@ -263,12 +267,9 @@ function ProductList({ onHomeClick }) {
         dispatch(addItem(plant));
         setAddedToCart((prevState) => ({
             ...prevState,
-            [plant.name]: true, // Set the product name as key and value as true
+            [plant.name]: true,
         }));
     };
-
-    
-
 
     return (
         <div>
@@ -283,36 +284,54 @@ function ProductList({ onHomeClick }) {
                             </div>
                         </a>
                     </div>
-
                 </div>
                 <div style={styleObjUl}>
-                    <div> <a href="#" onClick={(e) => handlePlantsClick(e)} style={styleA}>Plants</a></div>
-                    <div> <a href="#" onClick={(e) => handleCartClick(e)} style={styleA}><h1 className='cart'><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" id="IconChangeColor" height="68" width="68"><rect width="156" height="156" fill="none"></rect><circle cx="80" cy="216" r="12"></circle><circle cx="184" cy="216" r="12"></circle><path d="M42.3,72H221.7l-26.4,92.4A15.9,15.9,0,0,1,179.9,176H84.1a15.9,15.9,0,0,1-15.4-11.6L32.5,37.8A8,8,0,0,0,24.8,32H8" fill="none" stroke="#faf9f9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" id="mainIconPathAttribute"></path></svg></h1></a></div>
+                    <div>
+                        <a href="#" onClick={(e) => handlePlantsClick(e)} style={styleA}>Plants</a>
+                    </div>
+                    <div>
+                        <a href="#" onClick={(e) => handleCartClick(e)} style={styleA}>
+                            <h1 className='cart'>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" id="IconChangeColor" height="68" width="68">
+                                    <rect width="156" height="156" fill="none"></rect>
+                                    <circle cx="80" cy="216" r="12"></circle>
+                                    <circle cx="184" cy="216" r="12"></circle>
+                                    <path d="M42.3,72H221.7l-26.4,92.4A15.9,15.9,0,0,1,179.9,176H84.1a15.9,15.9,0,0,1-15.4-11.6L32.5,37.8A8,8,0,0,0,24.8,32H8" fill="none" stroke="#faf9f9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" id="mainIconPathAttribute"></path>
+                                </svg>
+                                <span className="cart_quantity_count">{totalQuantity}</span>
+                            </h1>
+                        </a>
+                    </div>
                 </div>
             </div>
             {!showCart ? (
                 <div className="product-grid">
-                {plantsArray.map((category, index) => (
-                    <div key={index} className="category-section">
-                        <h2 className="plant_heading">{category.category}</h2>
-                        <div className="product-list">
-                            {category.plants.map((plant, plantIndex) => (
-                                <div key={plantIndex} className="product-card">
-                                    <img
-                                        src={plant.image}
-                                        alt={plant.name}
-                                        className="product-image"
-                                    />
-                                    <h3 className="product-title">{plant.name}</h3>
-                                    <p>{plant.description}</p>
-                                    <p className="product-price">{plant.cost}</p>
-                                    <button  className="product-button" onClick={() => handleAddToCart(plant)}>Add to Cart</button>
-                                </div>
-                            ))}
+                    {plantsArray.map((category, index) => (
+                        <div key={index} className="category-section">
+                            <h2 className="plant_heading">{category.category}</h2>
+                            <div className="product-list">
+                                {category.plants.map((plant, plantIndex) => (
+                                    <div key={plantIndex} className="product-card">
+                                        <img
+                                            src={plant.image}
+                                            alt={plant.name}
+                                            className="product-image"
+                                        />
+                                        <h3 className="product-title">{plant.name}</h3>
+                                        <p className="product-price">{plant.cost}</p>
+                                        <p>{plant.description}</p>
+                                        <button
+                                            className={`product-button ${addedToCart[plant.name] ? 'added-to-cart' : ''}`}
+                                            onClick={() => handleAddToCart(plant)}
+                                        >
+                                            {addedToCart[plant.name] ? 'Added to Cart' : 'Add to Cart'}
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                ))}
-            </div>
+                    ))}
+                </div>
             ) : (
                 <CartItem onContinueShopping={handleContinueShopping} />
             )}
