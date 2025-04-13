@@ -267,6 +267,8 @@ function ProductList({ onHomeClick }) {
         }));
     };
 
+    
+
 
     return (
         <div>
